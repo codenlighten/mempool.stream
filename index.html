@@ -191,15 +191,16 @@
           "wss://socket.whatsonchain.com/mempool"
         );
 
+        const phraseHex = toHex(phrase);
+        const capitalHex = toHex(phrase.toUpperCase());
+        const lowerHex = toHex(phrase.toLowerCase());
+        const firstLetterUpperCase = toHex(phrase.charAt(0).toUpperCase());
+        const firstLetterLowerCase = toHex(phrase.charAt(0).toLowerCase());
+
         centrifuge.on("publish", function (message) {
           console.log("Transaction: ", message.data);
           let dataOutputs = message.data.vout;
           let hex = message.data.hex;
-          let phraseHex = toHex(phrase);
-          let capitalHex = toHex(phrase.toUpperCase());
-          let lowerHex = toHex(phrase.toLowerCase());
-          let firstLetterUpperCase = toHex(phrase.charAt(0).toUpperCase());
-          let firstLetterLowerCase = toHex(phrase.charAt(0).toLowerCase());
           dataOutputs.forEach((output) => {
             if (
               output.scriptPubKey.hex.includes(phraseHex) ||
@@ -211,14 +212,9 @@
               const script = new bsv.Script(output.scriptPubKey.hex);
               console.log(hex, script.toASM());
               let asm = script.toASM();
-              //remove first 2 indexes
               let asmArray = asm.split(" ");
               asmArray.splice(0, 2);
-              const converted = [];
-              asmArray.forEach((hex) => {
-                converted.push(hexConvert(hex));
-              });
-              //   alert("found");
+              const converted = asmArray.map(hexConvert);
               console.log("Match found in transaction:", message.data.txid);
               displayMessage(
                 message.data.txid,
