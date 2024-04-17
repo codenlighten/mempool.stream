@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BSV Mempool Listener</title>
+    <style>
+      body {
+        font-family: "Montserrat", sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        color: #ff5400;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      input,
+      button {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        width: calc(
+          100% - 22px
+        ); /* Properly adjusts width to account for padding */
+        display: block; /* Ensures input and button width is consistent */
+      }
+      input {
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      button {
+        background-color: #ff5400;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #e04e00;
+      }
+      #messages {
+        display: block;
+        padding: 10px;
+        margin-top: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        height: 300px;
+        overflow-y: auto;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        word-wrap: break-word;
+      }
+      #messages div {
+        background-color: #f9f9f9;
+        border: 1px solid #e1e1e1;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        word-wrap: break-word;
+      }
+
+      #copyright2024GregoryWard {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 10px 0;
+      }
+      #status {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+        h1 {
+          font-size: 1.5rem;
+        }
+        input,
+        button {
+          padding: 5px;
+          margin: 5px 0;
+          width: calc(100% - 10px); /* Adjust width for smaller padding */
+        }
+        #messages {
+          margin-top: 10px;
+          height: 200px;
+        }
+        #messages div {
+          padding: 5px;
+          margin: 5px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>BSV Mempool Listener</h1>
+    <p id="status"></p>
+    <input
+      type="text"
+      id="subscription"
+      placeholder="Enter term to listen for"
+    />
+    <button onclick="subscribe()">Subscribe</button>
+    <button onclick="mem()">Connect to Mempool</button>
+    <button onclick="clearMessages()">Clear Messages</button>
+    <div id="messages"></div>
+
+    <div id="copyright2024GregoryWard">Copyright © 2024 Gregory Ward</div>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/bsv@1.5.0/bsv.min.js"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"
+      integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/gh/centrifugal/centrifuge-js@2.X.X/dist/centrifuge.min.js"></script>
+    <script>
+      const Buffer = bsv.deps.Buffer;
+      const toHex = (string) => {
+        return Buffer.from(string).toString("hex");
+      };
+      function clearMessages() {
+        document.getElementById("messages").innerHTML = "";
+      }
+
+      const hexConvert = (hexString) => {
+        let str = "";
+        for (let n = 0; n < hexString.length; n += 2) {
+          str += String.fromCharCode(parseInt(hexString.substr(n, 2), 16));
+        }
+        return str;
+      };
+      var subscriptions = [];
+      let subscribe = () => {
+        document.getElementById("messages").innerHTML = "";
+        // document.getElementById("messages").style.display = "block";
+        document.getElementById("status").innerHTML =
+          "listening for: " + document.getElementById("subscription").value;
+        let subscription = document.getElementById("subscription").value;
+        subscriptions.push(subscription);
+        localStorage.subscriptions = JSON.stringify(subscriptions);
+        console.log("Subscribed to: " + subscription);
+
+        getMem(subscription);
+      };
+
+      const mem = () => {
+        const centrifuge = new Centrifuge(
+          "wss://socket.whatsonchain.com/mempool"
+        );
+        centrifuge.on("connect", function (ctx) {
+          console.log(
+            "Connected with client ID " + ctx.client + " over " + ctx.transport
+          );
+        });
+        centrifuge.connect();
+      };
+
+      const getMem = (phrase) => {
+        const centrifuge = new Centrifuge(
+          "wss://socket.whatsonchain.com/mempool"
+        );
+
+        centrifuge.on("publish", function (message) {
+          console.log("Transaction: ", message.data);
+          let dataOutputs = message.data.vout;
+          let hex = message.data.hex;
+          let phraseHex = toHex(phrase);
+
+          dataOutputs.forEach((output) => {
+            if (output.scriptPubKey.hex.includes(phraseHex)) {
+              const script = new bsv.Script(output.scriptPubKey.hex);
+              console.log(hex, script.toASM());
+              let asm = script.toASM();
+              //remove first 2 indexes
+              let asmArray = asm.split(" ");
+              asmArray.splice(0, 2);
+              const converted = [];
+              asmArray.forEach((hex) => {
+                converted.push(hexConvert(hex));
+              });
+              //   alert("found");
+              console.log("Match found in transaction:", message.data.txid);
+              displayMessage(
+                message.data.txid,
+                output.scriptPubKey.hex,
+                converted
+              );
+            }
+          });
+        });
+        centrifuge.connect();
+      };
+
+      const displayMessage = (txid, data, hexConvertedArray) => {
+        const messageList = document.getElementById("messages");
+        const messageItem = document.createElement("div");
+        const hexDiv = document.createElement("div");
+        hexConvertedArray.forEach((hex) => {
+          const hexItem = document.createElement("div");
+          hexItem.innerHTML = hex;
+          hexDiv.appendChild(hexItem);
+        });
+        // messageItem.innerHTML = `<strong>Transaction ID:</strong> ${txid} <br> <strong>Data:</strong> ${data}`;
+        messageItem.innerHTML = `<strong>Transaction ID:</strong> ${txid}`;
+        messageList.appendChild(messageItem);
+        messageList.appendChild(hexDiv);
+      };
+    </script>
+  </body>
+</html>
