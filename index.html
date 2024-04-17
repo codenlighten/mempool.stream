@@ -130,6 +130,12 @@
     <button onclick="subscribe()">Subscribe</button>
     <button onclick="mem()">Connect to Mempool</button>
     <button onclick="clearMessages()">Clear Messages</button>
+    <!-- clear subscriptions -->
+    <button
+      onclick="localStorage.removeItem('subscriptions');subscriptions=[];document.getElementById('status').innerHTML='';"
+    >
+      Clear Subscriptions
+    </button>
     <div id="messages"></div>
 
     <div id="copyright2024GregoryWard">Copyright © 2024 Gregory Ward</div>
