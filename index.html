@@ -162,7 +162,11 @@
     <button title="Click to add term & listen to mempool" onclick="subscribe()">
       Subscribe
     </button>
-    <button title="Click to listen to all mempool txs" onclick="mem()">
+    <button
+      id="connectMempool"
+      title="Click to listen to all mempool txs"
+      onclick="mem()"
+    >
       Connect to Mempool
     </button>
     <button title="Click to clear messages" onclick="clearMessages()">
@@ -174,6 +178,10 @@
       onclick="localStorage.removeItem('subscriptions');subscriptions=[];document.getElementById('status').innerHTML='';"
     >
       Clear Subscriptions
+    </button>
+    <!-- stop listening -->
+    <button title="Click to stop listening to mempool" id="stopListening">
+      Stop Listening
     </button>
     <div id="messages"></div>
 
@@ -192,6 +200,8 @@
     ></script>
     <script src="https://cdn.jsdelivr.net/gh/centrifugal/centrifuge-js@2.X.X/dist/centrifuge.min.js"></script>
     <script>
+      let listening = false;
+      let centrifuge = null; // Declare centrifuge globally
       const Buffer = bsv.deps.Buffer;
       const toHex = (string) => {
         return Buffer.from(string).toString("hex");
@@ -222,13 +232,12 @@
       };
 
       const mem = () => {
-        const centrifuge = new Centrifuge(
-          "wss://socket.whatsonchain.com/mempool"
-        );
+        centrifuge = new Centrifuge("wss://socket.whatsonchain.com/mempool");
 
         centrifuge.on("publish", function (message) {
           console.log("Transaction: ", message.data);
           let dataOutputs = message.data.vout;
+          listening = true;
           dataOutputs.forEach((output) => {
             console.log(output.scriptPubKey.hex);
             //add asm to hex conversion and display
@@ -275,10 +284,8 @@
       };
 
       const getMem = (phrase) => {
-        const centrifuge = new Centrifuge(
-          "wss://socket.whatsonchain.com/mempool"
-        );
-
+        centrifuge = new Centrifuge("wss://socket.whatsonchain.com/mempool");
+        listening = true;
         const phraseHex = toHex(phrase);
         const capitalHex = toHex(phrase.toUpperCase());
         const lowerHex = toHex(phrase.toLowerCase());
@@ -336,6 +343,11 @@
         messageList.insertBefore(hexDiv, messageList.firstChild);
         messageList.insertBefore(txidLink, messageList.firstChild);
       };
+
+      document.getElementById("stopListening").addEventListener("click", () => {
+        listening = false;
+        centrifuge.disconnect();
+      });
     </script>
   </body>
 </html>
