@@ -196,9 +196,20 @@
           let dataOutputs = message.data.vout;
           let hex = message.data.hex;
           let phraseHex = toHex(phrase);
-
+          let capitalHex = phraseHex.toUpperCase();
+          let lowerHex = phraseHex.toLowerCase();
+          let firstLetter =
+            phraseHex.charAt(0).toUpperCase() + phraseHex.slice(1);
+          let firstLetterLower =
+            phraseHex.charAt(0).toLowerCase() + phraseHex.slice(1);
           dataOutputs.forEach((output) => {
-            if (output.scriptPubKey.hex.includes(phraseHex)) {
+            if (
+              output.scriptPubKey.hex.includes(phraseHex) ||
+              output.scriptPubKey.hex.includes(capitalHex) ||
+              output.scriptPubKey.hex.includes(lowerHex) ||
+              output.scriptPubKey.hex.includes(firstLetter) ||
+              output.scriptPubKey.hex.includes(firstLetterLower)
+            ) {
               const script = new bsv.Script(output.scriptPubKey.hex);
               console.log(hex, script.toASM());
               let asm = script.toASM();
