@@ -203,11 +203,12 @@
           let hex = message.data.hex;
           dataOutputs.forEach((output) => {
             if (
-              output.scriptPubKey.hex.includes(phraseHex) ||
-              output.scriptPubKey.hex.includes(capitalHex) ||
-              output.scriptPubKey.hex.includes(lowerHex) ||
-              output.scriptPubKey.hex.includes(firstLetterUpperCase) ||
-              output.scriptPubKey.hex.includes(firstLetterLowerCase)
+              output.scriptPubKey.hex.includes(phraseHex)
+              //   ||
+              //   output.scriptPubKey.hex.includes(capitalHex) ||
+              //   output.scriptPubKey.hex.includes(lowerHex) ||
+              //   output.scriptPubKey.hex.includes(firstLetterUpperCase) ||
+              //   output.scriptPubKey.hex.includes(firstLetterLowerCase)
             ) {
               const script = new bsv.Script(output.scriptPubKey.hex);
               console.log(hex, script.toASM());
