@@ -184,10 +184,51 @@
         const centrifuge = new Centrifuge(
           "wss://socket.whatsonchain.com/mempool"
         );
-        centrifuge.on("connect", function (ctx) {
-          console.log(
-            "Connected with client ID " + ctx.client + " over " + ctx.transport
-          );
+
+        centrifuge.on("publish", function (message) {
+          console.log("Transaction: ", message.data);
+          let dataOutputs = message.data.vout;
+          dataOutputs.forEach((output) => {
+            console.log(output.scriptPubKey.hex);
+            //add asm to hex conversion and display
+            const script = new bsv.Script(output.scriptPubKey.hex);
+            let asm = script.toASM();
+            //check if op_return
+            if (asm.includes("OP_RETURN")) {
+              console.log("OP_RETURN found");
+              //show in status
+              document.getElementById("status").innerHTML =
+                "OP_RETURN found in transaction: " + message.data.txid;
+              let asmArray = asm.split(" ");
+              asmArray.splice(0, 2);
+              const converted = asmArray.map(hexConvert);
+              console.log("Converted: ", converted);
+              displayMessage(
+                message.data.txid,
+                output.scriptPubKey.hex,
+                converted
+              );
+            }
+            //if hex contains 6f7264 (ord) then convert to ascii
+            if (output.scriptPubKey.hex.includes("6f7264")) {
+              console.log("Found ord");
+              //show in status
+              document.getElementById("status").innerHTML =
+                "ord found in transaction: " + message.data.txid;
+              let asmArray = asm.split(" ");
+              asmArray.splice(0, 2);
+              const converted = asmArray.map(hexConvert);
+              console.log("Converted: ", converted);
+              displayMessage(
+                message.data.txid,
+                output.scriptPubKey.hex,
+                converted
+              );
+            }
+            // let asmArray = asm.split(" ");
+            // asmArray.splice(0, 2);
+            // const converted = asmArray.map(hexConvert);
+          });
         });
         centrifuge.connect();
       };
