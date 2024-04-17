@@ -196,12 +196,10 @@
           let dataOutputs = message.data.vout;
           let hex = message.data.hex;
           let phraseHex = toHex(phrase);
-          let capitalHex = phraseHex.toUpperCase();
-          let lowerHex = phraseHex.toLowerCase();
-          let firstLetter =
-            phraseHex.charAt(0).toUpperCase() + phraseHex.slice(1);
-          let firstLetterLower =
-            phraseHex.charAt(0).toLowerCase() + phraseHex.slice(1);
+          let capitalHex = toHex(phrase.toUpperCase());
+          let lowerHex = toHex(phrase.toLowerCase());
+          let firstLetterUpperCase = toHex(phrase.charAt(0).toUpperCase());
+          let firstLetterLowerCase = toHex(phrase.charAt(0).toLowerCase());
           dataOutputs.forEach((output) => {
             if (
               output.scriptPubKey.hex.includes(phraseHex) ||
