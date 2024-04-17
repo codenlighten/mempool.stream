@@ -15,16 +15,31 @@
     <meta name="author" content="Gregory Ward" />
     <meta name="robots" content="index, follow" />
     <meta name="revisit-after" content="1 day" />
+    <!-- twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@gregoryward" />
+    <meta name="twitter:creator" content="@gregoryward" />
+    <meta
+      name="twitter:title"
+      content="Mempool Stream - BSV Mempool Listener"
+    />
+    <meta
+      name="twitter:description"
+      content="Listen for specific data in the BSV Mempool"
+    />
+    <meta name="twitter:image" content="https://mempoolstream.com/logo.webp" />
+    <!-- open graph -->
+    <meta property="og:title" content="BSV Mempool Listener" />
 
     <!-- favicon -->
-    <!-- <link rel="icon" href="favicon.ico" type="image/x-icon" /> -->
-    <!-- <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" /> -->
+    <link rel="icon" href="logo.webp" type="image/x-icon" />
+    <link rel="shortcut icon" href="logo.webp" type="image/x-icon" />
 
     <title>Mempool Stream - BSV Mempool Listener</title>
     <style>
       body {
         font-family: "Montserrat", sans-serif;
-        background-color: #f4f4f4;
+        background-color: #021629;
         color: #333;
         margin: 0;
         padding: 20px;
@@ -46,12 +61,12 @@
         display: block; /* Ensures input and button width is consistent */
       }
       input {
-        background-color: #fff;
+        background-color: #f9f9f9;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
       button {
         background-color: #ff5400;
-        color: white;
+        color: #fff;
         cursor: pointer;
         transition: background-color 0.3s;
       }
@@ -62,16 +77,16 @@
         display: block;
         padding: 10px;
         margin-top: 20px;
-        background-color: #fff;
+        background-color: #f9f9f9;
         border-radius: 5px;
-        border: 1px solid #ccc;
+        border: 1px solid #e1e1e1;
         height: 300px;
         overflow-y: auto;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         word-wrap: break-word;
       }
       #messages div {
-        background-color: #f9f9f9;
+        background-color: #fff;
         border: 1px solid #e1e1e1;
         padding: 10px;
         margin: 10px 0;
@@ -92,6 +107,11 @@
       #status {
         text-align: center;
         margin-bottom: 10px;
+      }
+      #logo {
+        display: block;
+        margin: 0 auto;
+        width: 100px;
       }
 
       /* Responsive adjustments */
@@ -116,10 +136,14 @@
           padding: 5px;
           margin: 5px 0;
         }
+        #logo {
+          width: 50px;
+        }
       }
     </style>
   </head>
   <body>
+    <img src="logo.webp" alt="" id="logo" />
     <h1>BSV Mempool Listener</h1>
     <p id="status"></p>
     <input
