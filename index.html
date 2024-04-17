@@ -284,10 +284,16 @@
           hexItem.innerHTML = hex;
           hexDiv.appendChild(hexItem);
         });
+        const txidLink = document.createElement("a");
+        txidLink.href = `https://whatsonchain.com/tx/${txid}`;
+        txidLink.target = "_blank";
+        txidLink.innerHTML = txid;
         // messageItem.innerHTML = `<strong>Transaction ID:</strong> ${txid} <br> <strong>Data:</strong> ${data}`;
         messageItem.innerHTML = `<strong>Transaction ID:</strong> ${txid}`;
-        messageList.appendChild(messageItem);
-        messageList.appendChild(hexDiv);
+        //add to top of div
+        messageList.insertBefore(messageItem, messageList.firstChild);
+        messageList.insertBefore(hexDiv, messageList.firstChild);
+        messageList.insertBefore(txidLink, messageList.firstChild);
       };
     </script>
   </body>
