@@ -193,7 +193,7 @@
     <!-- clear subscriptions -->
     <button
       title="Click to remove terms & stop listening to mempool"
-      onclick="localStorage.removeItem('subscriptions');subscriptions=[];document.getElementById('status').innerHTML='';"
+      onclick="localStorage.removeItem('subscriptions');subscriptions=[];document.getElementById('status').innerHTML='';alert('Subscriptions Cleared')"
     >
       Clear Subscriptions
     </button>
@@ -255,7 +255,7 @@
         subscriptions.push(subscription);
         localStorage.subscriptions = JSON.stringify(subscriptions);
         console.log("Subscribed to: " + subscription);
-
+        alert("Subscribed to: " + subscription);
         getMem(subscription);
       };
 
@@ -393,6 +393,7 @@
       document.getElementById("stopListening").addEventListener("click", () => {
         listening = false;
         centrifuge.disconnect();
+        alert("Stopped listening to mempool");
       });
     </script>
   </body>
