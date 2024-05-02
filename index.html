@@ -408,7 +408,10 @@
       });
 
       const showSubscriptions = () => {
-        if (localStorage.subscriptions) {
+        if (
+          localStorage.subscriptions &&
+          localStorage.subscriptions.length > 0
+        ) {
           alert("Current Subscriptions: " + localStorage.subscriptions);
         } else {
           alert("No subscriptions found");
