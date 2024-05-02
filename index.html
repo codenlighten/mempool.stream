@@ -121,6 +121,20 @@
         color: #ff5400;
       }
 
+      #strictCheck {
+        /* keep label and input on same line when large screen */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #strictCheck input {
+        margin-right: 5px;
+        width: 20px;
+      }
+      #strictCheck label {
+        color: #fff;
+      }
+
       /* Responsive adjustments */
       @media (max-width: 768px) {
         body {
@@ -159,6 +173,10 @@
       id="subscription"
       placeholder="Enter term to listen for"
     />
+    <div id="strictCheck">
+      <input type="checkbox" id="strict" />
+      <label for="strict">Strict Capitalization</label>
+    </div>
     <button title="Click to add term & listen to mempool" onclick="subscribe()">
       Subscribe
     </button>
@@ -204,7 +222,12 @@
     <script>
       let listening = false;
       let centrifuge = null; // Declare centrifuge globally
+      let strict = false;
       const Buffer = bsv.deps.Buffer;
+      document.getElementById("strict").addEventListener("change", () => {
+        strict = !strict;
+        alert("Strict Capitalization: " + strict);
+      });
       const toHex = (string) => {
         return Buffer.from(string).toString("hex");
       };
@@ -218,6 +241,9 @@
           str += String.fromCharCode(parseInt(hexString.substr(n, 2), 16));
         }
         return str;
+      };
+      const hexToAscii = (hex) => {
+        return Buffer.from(hex, "hex").toString("utf8");
       };
       var subscriptions = [];
       let subscribe = () => {
@@ -298,14 +324,33 @@
           console.log("Transaction: ", message.data);
           let dataOutputs = message.data.vout;
           let hex = message.data.hex;
+          let phraseAscii = hexToAscii(phraseHex);
+          let capitalAscii = hexToAscii(capitalHex);
           dataOutputs.forEach((output) => {
-            if (
-              output.scriptPubKey.hex.includes(phraseHex) ||
-              output.scriptPubKey.hex.includes(capitalHex) ||
-              output.scriptPubKey.hex.includes(lowerHex)
-              //   output.scriptPubKey.hex.includes(firstLetterUpperCase) ||
-              //   output.scriptPubKey.hex.includes(firstLetterLowerCase)
-            ) {
+            let ascii = hexToAscii(output.scriptPubKey.hex);
+            let asciiUpper = hexToAscii(output.scriptPubKey.hex).toUpperCase();
+            if (!strict) {
+              if (
+                output.scriptPubKey.hex.includes(phraseHex) ||
+                output.scriptPubKey.hex.includes(capitalHex) ||
+                output.scriptPubKey.hex.includes(lowerHex) ||
+                asciiUpper.includes(capitalAscii) ||
+                ascii.includes(phraseAscii)
+              ) {
+                const script = new bsv.Script(output.scriptPubKey.hex);
+                console.log(hex, script.toASM());
+                let asm = script.toASM();
+                let asmArray = asm.split(" ");
+                asmArray.splice(0, 2);
+                const converted = asmArray.map(hexConvert);
+                console.log("Match found in transaction:", message.data.txid);
+                displayMessage(
+                  message.data.txid,
+                  output.scriptPubKey.hex,
+                  converted
+                );
+              }
+            } else if (output.scriptPubKey.hex.includes(phraseHex)) {
               const script = new bsv.Script(output.scriptPubKey.hex);
               console.log(hex, script.toASM());
               let asm = script.toASM();
