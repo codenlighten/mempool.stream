@@ -248,10 +248,14 @@
       var subscriptions = [];
       let subscribe = () => {
         document.getElementById("messages").innerHTML = "";
-        // document.getElementById("messages").style.display = "block";
         document.getElementById("status").innerHTML =
           "listening for: " + document.getElementById("subscription").value;
         let subscription = document.getElementById("subscription").value;
+        //if already subscribed then return
+        if (subscriptions.includes(subscription)) {
+          alert("Already subscribed to: " + subscription);
+          return;
+        }
         subscriptions.push(subscription);
         localStorage.subscriptions = JSON.stringify(subscriptions);
         console.log("Subscribed to: " + subscription);
