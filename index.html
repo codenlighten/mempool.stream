@@ -433,6 +433,9 @@
         subscriptions = [];
         document.getElementById("status").innerHTML = "";
         localStorage.subscriptions = JSON.stringify(subscriptions);
+        // stop listening
+        listening = false;
+        centrifuge.disconnect();
         alert("Subscriptions Cleared");
       };
     </script>
