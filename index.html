@@ -204,7 +204,7 @@
     <!-- button show current subscriptions -->
     <button
       title="Click to show current subscriptions"
-      onclick="alert('Current Subscriptions: ' + localStorage.subscriptions)"
+      onclick="showSubscriptions()"
     >
       Show Subscriptions
     </button>
@@ -406,6 +406,14 @@
         centrifuge.disconnect();
         alert("Stopped listening to mempool");
       });
+
+      const showSubscriptions = () => {
+        if (localStorage.subscriptions) {
+          alert("Current Subscriptions: " + localStorage.subscriptions);
+        } else {
+          alert("No subscriptions found");
+        }
+      };
     </script>
   </body>
 </html>
