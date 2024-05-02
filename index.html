@@ -204,7 +204,7 @@
     <!-- clear subscriptions -->
     <button
       title="Click to remove terms & stop listening to mempool"
-      onclick="localStorage.removeItem('subscriptions');subscriptions=[];document.getElementById('status').innerHTML='';alert('Subscriptions Cleared');"
+      onclick="clearSubscriptions()"
     >
       Clear Subscriptions
     </button>
@@ -427,6 +427,13 @@
         } else {
           alert("No subscriptions found");
         }
+      };
+
+      const clearSubscriptions = () => {
+        subscriptions = [];
+        document.getElementById("status").innerHTML = "";
+        localStorage.subscriptions = JSON.stringify(subscriptions);
+        alert("Subscriptions Cleared");
       };
     </script>
   </body>
